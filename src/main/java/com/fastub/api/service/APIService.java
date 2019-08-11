@@ -66,7 +66,7 @@ public class APIService {
 			url = "/" + url;
 			logger.info("After adding backward slash at start of the URL " + url);
 		}
-
+		
 		int lenghtOfUrl = 0;
 		try {
 			lenghtOfUrl = StringUtils.countMatches(URLDecoder.decode(url, "UTF-8"), "/");
@@ -120,17 +120,33 @@ public class APIService {
 		return apiRepository.findAllByOrderByCreatedAtDesc();
 	}
 
-	public List<ApiResponseDto> getApiResponse(Integer apiId) {
+	public ApiDto getApiResponse(Integer apiId) {
 
 		logger.info("Returning api response for API ID " + apiId);
+		
+		if(StringUtils.isBlank(String.valueOf(apiId))) {
+			throw new EntityNotFoundException("Invalid request.");
+		}
+		
+		Optional<ApiRequest> apiRequestOptional = apiRepository.findById(apiId);
+		
+		if(!apiRequestOptional.isPresent()) {
+			throw new EntityNotFoundException("Invalid route ID.");
+		}
+		
+		
 
-		ApiRequest apiRequest = new ApiRequest();
-		apiRequest.setId(apiId);
-
-		List<ApiResponse> apiResponses = apiResponseRepository.findByApiRequestId(apiId);
-
-		return getResponseAsJson(apiResponses);
-
+		ApiRequest apiRequest = apiRequestOptional.get();
+		
+		List<ApiResponse> apiResponses = apiRequest.getApiResponse();
+		
+		List<ApiResponseDto> apiResponseDtos = getResponseAsJson(apiResponses);
+		
+		ApiDto apiDto = new ApiDto();
+		apiDto.setHttpMethod(apiRequest.getHttpMethod());
+		apiDto.setLatency(apiRequest.getLatency());
+		apiDto.setResponseDtos(apiResponseDtos);
+		return apiDto;
 	}
 
 	private List<ApiResponseDto> getResponseAsJson(List<ApiResponse> apiResponses) {
@@ -234,6 +250,7 @@ public class APIService {
 		ApiRequest apiToUpdate = api.get();
 
 		apiToUpdate.setHttpMethod(apiDto.getHttpMethod());
+		apiToUpdate.setLatency(apiDto.getLatency());
 
 		List<ApiResponse> apiResponses = new ArrayList<ApiResponse>();
 
@@ -411,6 +428,11 @@ public class APIService {
 
 		return apiRequests;
 
+	}
+	
+	public void deleteAllRoutes() {
+		logger.info("Deleting all routes...");
+		apiRepository.deleteAll();
 	}
 
 }
