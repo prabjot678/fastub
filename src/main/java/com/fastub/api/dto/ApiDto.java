@@ -11,7 +11,7 @@ public class ApiDto {
 	private String url;
 	private String description;
 	private String httpMethod;
-	
+	private long latency;
 	private List<ApiResponseDto> responseDtos;
 	
 	private List<ResponseHeader> responseHeaders = new ArrayList<ResponseHeader>();
@@ -54,5 +54,12 @@ public class ApiDto {
 	public void setResponseHeaders(List<ResponseHeader> responseHeaders) {
 		this.responseHeaders = responseHeaders;
 	}
+	public long getLatency() {
+		return latency;
+	}
+	public void setLatency(long latency) {
+		this.latency = latency;
+	}
+
 	
 }
