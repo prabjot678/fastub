@@ -1,6 +1,7 @@
 package com.fastub.api.controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -8,6 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,14 +23,14 @@ import com.fastub.api.dto.ApiDto;
 import com.fastub.api.dto.ApiResponseDto;
 import com.fastub.api.dto.HttpStatusCodeDto;
 import com.fastub.api.dto.ResponseHeaderDto;
-import com.fastub.api.dto.ResponseJson;
 import com.fastub.api.model.ApiRequest;
 import com.fastub.api.model.ResponseHeader;
 import com.fastub.api.service.APIService;
 
+@CrossOrigin
 @RestController
 public class APIController {
-	
+
 	private static final Logger logger = LogManager.getLogger(APIController.class);
 
 	@Autowired
@@ -36,7 +38,8 @@ public class APIController {
 
 	@PostMapping("/fastub/api")
 	public ApiRequest saveAPI(@RequestBody ApiDto api) {
-		
+	
+
 		logger.info("Executing saveAPI() method, passing request to APIService");
 
 		return apiService.saveAPI(api);
@@ -65,7 +68,7 @@ public class APIController {
 	}
 
 	@GetMapping("/fastub/api/{apiId}/api-response")
-	public List<ApiResponseDto> getApiResponse(@PathVariable("apiId") Integer apiId) {
+	public ApiDto getApiResponse(@PathVariable("apiId") Integer apiId) {
 
 		return apiService.getApiResponse(apiId);
 
@@ -80,7 +83,7 @@ public class APIController {
 
 	@GetMapping("/fastub/api/meta-data")
 	public List<HttpStatusCodeDto> getMetaData() {
-		
+
 		logger.info("Method execution starts getMetaData()");
 
 		List<HttpStatusCodeDto> httpStatusCodeDtos = new ArrayList<HttpStatusCodeDto>();
@@ -92,7 +95,7 @@ public class APIController {
 			httpStatusCodeDto.setName(httpStatus.value() + "-" + httpStatus.getReasonPhrase());
 			httpStatusCodeDtos.add(httpStatusCodeDto);
 		}
-		
+
 		logger.info("Method execution finished getMetaData()");
 
 		return httpStatusCodeDtos;
@@ -100,16 +103,29 @@ public class APIController {
 	}
 
 	@PutMapping("/fastub/api/{apiId}/response-headers")
-	public List<ResponseHeader> saveHeaders(@PathVariable("apiId") Integer apiId, @RequestBody ResponseHeaderDto responseHeaderDto){
-		
+	public List<ResponseHeader> saveHeaders(@PathVariable("apiId") Integer apiId,
+			@RequestBody ResponseHeaderDto responseHeaderDto) {
+
 		return apiService.saveHeaders(apiId, responseHeaderDto);
 	}
-	
+
 	@GetMapping("/fastub/api/search")
-	public List<ApiRequest> searchApi(@RequestParam("keyword") String keyword){
-		
+	public List<ApiRequest> searchApi(@RequestParam("keyword") String keyword) {
+
 		return apiService.searchApi(keyword);
-		
+
+	}
+
+	@DeleteMapping("/fastub/routes")
+	public Map<String, Object> deleteAllRoutes() {
+
+		apiService.deleteAllRoutes();
+
+		HashMap<String, Object> response = new HashMap<String, Object>();
+
+		response.put("message", "Routes deleted sucessfully.");
+
+		return response;
 	}
 
 }
