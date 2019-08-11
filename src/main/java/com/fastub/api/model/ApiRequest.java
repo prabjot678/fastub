@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
@@ -16,29 +17,28 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Entity
-public class ApiRequest extends Base{
-	
+public class ApiRequest extends Base {
+
 	private String url;
-	
-	
-	@OneToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY,mappedBy = "apiRequest")
+
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "apiRequest")
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	@JsonIgnore
 	private List<ApiResponse> apiResponse = new ArrayList<ApiResponse>();
-	
-	@OneToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY,mappedBy = "apiRequest")
+
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "apiRequest")
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	@JsonIgnore
 	private List<ResponseHeader> responseHeaders;
-	
-	
+
 	private String httpMethod;
-	
+
 	private String paramPosition;
-	
+
 	private int urlLength;
 
-	
+	@Column(columnDefinition = "BIGINT default '0'")
+	private long latency;
 
 	public String getUrl() {
 		return url;
@@ -48,8 +48,6 @@ public class ApiRequest extends Base{
 		this.url = url;
 	}
 
-
-
 	public List<ApiResponse> getApiResponse() {
 		return apiResponse;
 	}
@@ -57,7 +55,6 @@ public class ApiRequest extends Base{
 	public void setApiResponse(List<ApiResponse> apiResponse) {
 		this.apiResponse = apiResponse;
 	}
-
 
 	public String getHttpMethod() {
 		return httpMethod;
@@ -91,13 +88,17 @@ public class ApiRequest extends Base{
 		this.responseHeaders = responseHeaders;
 	}
 
+	public long getLatency() {
+		return latency;
+	}
+
+	public void setLatency(long latency) {
+		this.latency = latency;
+	}
+
 	@Override
 	public String toString() {
 		return "ApiRequest [url=" + url + ", id=" + id + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + "]";
 	}
-	
-	
-
-	
 
 }
